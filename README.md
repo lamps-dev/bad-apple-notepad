@@ -3,9 +3,12 @@ This supports both and i started with the terminal version first.
 
 ## Demo(s)
 **Notepad (with audio):**
-<video controls src="src/docs/demo2.mp4" title="Title"></video>
+
+https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo2.mp4
+
 **Terminal (with audio):**
-<video controls src="src/docs/demo1.mp4" title="Title"></video>
+
+https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo1.mp4
 
 
 > [!WARNING]
