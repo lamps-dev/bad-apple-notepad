@@ -2,13 +2,13 @@
 This supports both and i started with the terminal version first.
 
 ## Demo(s)
-**Notepad (with audio):**
+**Demo 1:**
 
-<video controls src="https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo2.mp4"></video>
+[![Demo 1](https://img.shields.io/badge/▶_Watch_Demo_1-blue?style=for-the-badge)](https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo1.mp4)
 
-**Terminal (with audio):**
+**Demo 2:**
 
-<video controls src="https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo1.mp4"></video>
+[![Demo 2](https://img.shields.io/badge/▶_Watch_Demo_2-blue?style=for-the-badge)](https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo2.mp4)
 
 
 > [!WARNING]
