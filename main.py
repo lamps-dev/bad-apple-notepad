@@ -20,6 +20,7 @@ parser.add_argument("-o", "--output", help="filename and file format to output (
 parser.add_argument("--width", help="ASCII art width in characters (default: 80)", type=int, default=80)
 parser.add_argument("--height", help="ASCII art height in characters (default: 40)", type=int, default=40)
 parser.add_argument("--mode", help="display mode: 'notepad' or 'terminal' (default: terminal)", default="terminal")
+parser.add_argument("--color", help="enable colorful output: true/false (default: false)", default="false", choices=["true", "false"])
 
 args = parser.parse_args()
 
@@ -31,8 +32,12 @@ def extract_frames(clip, times, imgdir):
         imgpath = os.path.join(imgdir, '{}.png'.format(int(t * clip.fps)))
         clip.save_frame(imgpath, t)
 
-if not str(args.input).endswith((".mp4", ".gif")):
-     print("please either use a gif or video file")
+if not str(args.input).endswith((".mp4")):
+     print("please either use a video file")
+     exit(1)
+
+if args.mode == "notepad" and args.color == "true":
+     print("color mode is not supported with notepad (notepad cannot render ANSI color codes)")
      exit(1)
 
 clip = VideoFileClip(args.input)
@@ -111,7 +116,7 @@ for filename in filenames:
     frame_start = time.time()
 
     filepath = os.path.join("./imgs", filename)
-    ascii_art = image_to_ascii(filepath, size=(args.width, args.height), colorful=False, fix_scaling=False)
+    ascii_art = image_to_ascii(filepath, size=(args.width, args.height), colorful=args.color == "true", fix_scaling=False)
 
     if args.mode == "notepad":
         win32api.SendMessage(edit, win32con.WM_SETTEXT, 0, ascii_art)
