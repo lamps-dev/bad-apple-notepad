@@ -4,11 +4,11 @@ This supports both and i started with the terminal version first.
 ## Demo(s)
 **Notepad (with audio):**
 
-https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo2.mp4
+<video controls src="https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo2.mp4"></video>
 
 **Terminal (with audio):**
 
-https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo1.mp4
+<video controls src="https://github.com/lamps-dev/bad-apple-notepad/raw/main/src/docs/demo1.mp4"></video>
 
 
 > [!WARNING]
