@@ -1,0 +1,7 @@
+moviepy
+pygame-ce
+pillow
+numpy
+requests
+sty
+pywin32
