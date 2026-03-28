@@ -1,0 +1,3 @@
+[submodule "image-to-ascii"]
+	path = image-to-ascii
+	url = https://github.com/lamps-dev/img-to-ascii-modified.git
