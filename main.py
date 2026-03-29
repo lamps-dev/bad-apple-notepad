@@ -49,7 +49,7 @@ fps = clip.fps
 
 # skip extraction if frames and audio already exist
 imgs_exist = os.path.isdir("./imgs") and len(os.listdir("./imgs")) > 0
-audio_exists = os.path.isfile("./src/bad_apple.mp3")
+audio_exists = os.path.isfile("./audio.mp3")
 
 if not imgs_exist or not audio_exists:
     print("processing, this may take a moment (depending on your video duration)")
@@ -57,7 +57,7 @@ if not imgs_exist or not audio_exists:
     if not imgs_exist:
         extract_frames(clip, times, "./imgs")
     if not audio_exists:
-        extract_audio(args.input)
+        extract_audio(args.input, "./audio.mp3")
 else:
     print("using cached frames and audio")
 
@@ -113,7 +113,7 @@ else:
     os.system('cls' if os.name == 'nt' else 'clear')
 
 # start music in a thread so it doesn't block frame rendering
-music_thread = threading.Thread(target=play_music, args=('./src/bad_apple.mp3',))
+music_thread = threading.Thread(target=play_music, args=('./audio.mp3',))
 music_thread.start()
 
 for filename in filenames:
