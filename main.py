@@ -9,7 +9,11 @@ import win32gui, win32con, win32api
 from moviepy import VideoFileClip
 from converter import image_to_ascii
 
-sys.path.insert(0, './src')
+# support both normal execution and PyInstaller bundled exe
+if getattr(sys, 'frozen', False):
+    sys.path.insert(0, os.path.join(sys._MEIPASS, 'src'))
+else:
+    sys.path.insert(0, './src')
 
 from music_manager import stop_music, play_music
 from audio_extractor import extract_audio

@@ -49,4 +49,4 @@ and enjoy!!
 > You might get high perfomance issues if you don't have a very good PC so be careful!
 
 ## How do I compile?
-You need to run `pyinstaller --onefile --add-data "image-to-ascii/converter.py;." --add-data "image-to-ascii/config.py;." --add-data "src/music_manager.py;src" --add-data "src/audio_extractor.py;src" main.py` to compile properly for Windows. (before doing so, make sure to `python -m venv .venv`, `.venv/Scripts/activate` and `pip install -r requirements.txt`)
+You need to run `pyinstaller --onefile --collect-all imageio --collect-all moviepy --hidden-import=pygame --hidden-import=PIL --hidden-import=numpy --hidden-import=sty --hidden-import=win32gui --hidden-import=win32con --hidden-import=win32api --add-data "image-to-ascii/converter.py;." --add-data "image-to-ascii/config.py;." --add-data "src/music_manager.py;src" --add-data "src/audio_extractor.py;src" main.py` to compile properly for Windows. (before doing so, make sure to `python -m venv .venv`, `.venv/Scripts/activate` and `pip install -r requirements.txt`)
