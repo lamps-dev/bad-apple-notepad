@@ -17,6 +17,10 @@ build/
 .venv/
 .env
 
+# Pyinstaller
+main.spec
+*.spec
+
 # IDE
 .vscode/
 .idea/

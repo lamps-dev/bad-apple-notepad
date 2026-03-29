@@ -47,3 +47,6 @@ and enjoy!!
 
 > [!WARNING]
 > You might get high perfomance issues if you don't have a very good PC so be careful!
+
+## How do I compile?
+You need to run `pyinstaller --onefile --add-data "image-to-ascii/converter.py;." --add-data "image-to-ascii/config.py;." --add-data "src/music_manager.py;src" --add-data "src/audio_extractor.py;src" main.py` to compile properly for Windows. (before doing so, make sure to `python -m venv .venv`, `.venv/Scripts/activate` and `pip install -r requirements.txt`)
