@@ -31,14 +31,14 @@ For the notepad part, it uses pywin32 since modifying the txt file and hoping wi
 ## How to run it yourself
 You need atleast:
 - Python 3.8 or newer,
-- Pip,
-- Mainly a windows PC.
+- pip and uv,
+- Mainly a Windows PC.
 
 ### 1. Install dependencies
 Run `pip install -r requirements.txt` to do so.
 
 ### 2. (optional) Get a video file
-(I recommend you using yt-dlp or https://ytdlp.online if you don't want the program directly)
+(I recommend you using https://cobalt.lamps-dev.dev (Recommended) (https://cobalt.meowing.de as a fallback if its offline) or yt-dlp depending on if you want to get the yt-dlp tool or not)
 
 ### 3. Run the script
 Recommended command: `python main.py --input bad_apple.mp4 --width 120 --height 50 --mode notepad`
@@ -46,7 +46,7 @@ Recommended command: `python main.py --input bad_apple.mp4 --width 120 --height 
 and enjoy!!
 
 > [!WARNING]
-> You might get high perfomance issues if you don't have a very good PC so be careful!
+> You might get high performance issues if you don't have a very good PC so be careful!
 
 ## How do I compile?
-You need to run `pyinstaller --onefile --collect-all imageio --collect-all moviepy --hidden-import=pygame --hidden-import=PIL --hidden-import=numpy --hidden-import=sty --hidden-import=win32gui --hidden-import=win32con --hidden-import=win32api --add-data "image-to-ascii/converter.py;." --add-data "image-to-ascii/config.py;." --add-data "src/music_manager.py;src" --add-data "src/audio_extractor.py;src" main.py` to compile properly for Windows. (before doing so, make sure to `python -m venv .venv`, `.venv/Scripts/activate` and `pip install -r requirements.txt`)
+You need to run `pyinstaller --onefile --collect-all imageio --collect-all moviepy --hidden-import=pygame --hidden-import=PIL --hidden-import=numpy --hidden-import=sty --hidden-import=win32gui --hidden-import=win32con --hidden-import=win32api --add-data "image-to-ascii/converter.py;." --add-data "image-to-ascii/config.py;." --add-data "src/music_manager.py;src" --add-data "src/audio_extractor.py;src" main.py` to compile properly for Windows. Before doing so, make sure to use [uv](https://docs.astral.sh/uv) (Recommended)
