@@ -1,5 +1,5 @@
 # Bad Apple, but for notepad and the terminal
-This supports both and i started with the terminal version first.
+This supports both and I started with the terminal version first.
 
 ## Demo(s)
 **Demo 1:**
@@ -21,6 +21,7 @@ This supports both and i started with the terminal version first.
 > If your video isn't an mp4, then you might need to convert it to an mp4, fortunately however, you can always use ffmpeg to do so! (if you don't have it, install it via [www.ffmpeg.org](https://www.ffmpeg.org/download.html)).
 > This program is also mainly for windows, im planning to port it over to linux too, but it may take a bit more time to do so, depending on how bad my code is atm.
 
+
 ## How it works
 It uses moviepy for audio extracting and extracting the frames of the specified video (bad apple in this instance) and uses a very neat open-source tool called "image-to-ascii" to convert all those frames to ascii text!
 
@@ -30,18 +31,27 @@ For the notepad part, it uses pywin32 since modifying the txt file and hoping wi
 
 ## How to run it yourself
 You need atleast:
-- Python 3.8 or newer,
-- pip and uv,
-- Mainly a Windows PC.
+- Python 3.8 or newer
+- pip and uv
+- Mainly a Windows PC (for now)
+- Git
+
+### 0.1. Clone the repository
+Install Git from git-scm.com, then restart your terminal (You can skip this step, only if you already have Git)
+
+Afterwards, run `git clone --recursive https://github.com/lamps-dev/bad-apple-notepad` (Don't forget the '--recursive', without it, the image-to-ascii sub-module will not be cloned!)
+
+Then, `cd bad-apple-notepad`
 
 ### 1. Install dependencies
-Run `pip install -r requirements.txt` to do so.
+Run `pip install -r requirements.txt`
 
 ### 2. (optional) Get a video file
-(I recommend you using https://cobalt.lamps-dev.dev (Recommended) (https://cobalt.meowing.de as a fallback if its offline) or yt-dlp depending on if you want to get the yt-dlp tool or not)
+(I recommend you using https://cobalt.meowing.de (Recommended) or yt-dlp depending on if you want to get the yt-dlp tool or not)
 
 ### 3. Run the script
-Recommended command: `python main.py --input bad_apple.mp4 --width 120 --height 50 --mode notepad`
+Recommended command (Terminal mode): `python main.py --input bad_apple.mp4 --width 120 --height 50`
+Notepad mode: `python main.py --input bad_apple.mp4 --width 120 --height 50 --mode notepad`
 
 and enjoy!!
 
