@@ -51,6 +51,7 @@ Run `pip install -r requirements.txt`
 
 ### 3. Run the script
 Recommended command (Terminal mode): `python main.py --input bad_apple.mp4 --width 120 --height 50`
+
 Notepad mode: `python main.py --input bad_apple.mp4 --width 120 --height 50 --mode notepad`
 
 and enjoy!!
