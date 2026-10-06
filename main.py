@@ -1,32 +1,42 @@
 import argparse
 import os
-import subprocess
 import sys
 import time
 import threading
-import win32gui, win32con, win32api
+
+# support both normal execution and PyInstaller bundled exe.
+# this has to happen before converter / src imports below.
+if getattr(sys, 'frozen', False):
+    sys.path.insert(0, os.path.join(sys._MEIPASS, 'src'))
+    sys.path.insert(0, sys._MEIPASS)
+else:
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    sys.path.insert(0, os.path.join(base_dir, 'src'))
+    sys.path.insert(0, os.path.join(base_dir, 'image-to-ascii'))
 
 from moviepy import VideoFileClip
 from converter import image_to_ascii
 
-# support both normal execution and PyInstaller bundled exe
-if getattr(sys, 'frozen', False):
-    sys.path.insert(0, os.path.join(sys._MEIPASS, 'src'))
-else:
-    sys.path.insert(0, './src')
-
 from music_manager import stop_music, play_music
 from audio_extractor import extract_audio
+from editor_common import NoEditorFound, NoTextBackend
+
+IS_WINDOWS = sys.platform == "win32"
+IS_LINUX = sys.platform.startswith("linux")
 
 parser = argparse.ArgumentParser(description="Bad Apple Python for notepad arguments")
 parser.add_argument("--input", help="path to your input file (video file), by default: bad_apple.mp4", default="bad_apple.mp4")
 parser.add_argument("-o", "--output", help="filename and file format to output (default: output.txt)", default="output.txt")
 parser.add_argument("--width", help="ASCII art width in characters (default: 80)", type=int, default=80)
 parser.add_argument("--height", help="ASCII art height in characters (default: 40)", type=int, default=40)
-parser.add_argument("--mode", help="display mode: 'notepad' or 'terminal' (default: terminal)", default="terminal")
+parser.add_argument("--mode", help="display mode: 'notepad' (a text editor window) or 'terminal' (default: terminal)", default="terminal", choices=["notepad", "editor", "terminal"])
 parser.add_argument("--color", help="enable colorful output: true/false (default: false)", default="false", choices=["true", "false"])
 
 args = parser.parse_args()
+
+# "editor" is just a nicer alias for "notepad" on non-Windows systems
+editor_mode = args.mode in ("notepad", "editor")
+
 
 def extract_frames(clip, times, imgdir):
     if not os.path.exists(imgdir):
@@ -36,101 +46,97 @@ def extract_frames(clip, times, imgdir):
         imgpath = os.path.join(imgdir, '{}.png'.format(int(t * clip.fps)))
         clip.save_frame(imgpath, t)
 
-if not str(args.input).endswith((".mp4")):
-     print("please either use a video file")
-     exit(1)
 
-if args.mode == "notepad" and args.color == "true":
-     print("color mode is not supported with notepad (notepad cannot render ANSI color codes)")
-     exit(1)
+def make_editor_driver():
+    """Return a driver for the current platform, or None to use the terminal."""
+    if IS_WINDOWS:
+        from windows_editor import create_driver
+    elif IS_LINUX:
+        from linux_editor import create_driver
+    else:
+        print("editor mode is only supported on Windows and Linux, "
+              "falling back to terminal mode")
+        return None
+
+    try:
+        return create_driver()
+    except NoEditorFound as exc:
+        # nothing to draw into at all -- this one is fatal
+        print(exc)
+        sys.exit(1)
+    except NoTextBackend as exc:
+        # an editor exists but nothing can push text into it
+        print(exc)
+        print("\nfalling back to terminal mode so the video still plays.")
+        return None
+
+
+if not str(args.input).endswith(".mp4"):
+    print("please either use a video file")
+    exit(1)
+
+if editor_mode and args.color == "true":
+    print("color mode is not supported in editor mode (text editors cannot render ANSI color codes)")
+    exit(1)
 
 clip = VideoFileClip(args.input)
 fps = clip.fps
 
+# each video gets its own cache, bad apple keeps using the frames shipped in the repo
+video_name = os.path.splitext(os.path.basename(args.input))[0]
+if video_name == "bad_apple":
+    imgs_dir = "./imgs"
+    audio_path = "./audio.mp3"
+else:
+    imgs_dir = os.path.join("./cache", video_name, "imgs")
+    audio_path = os.path.join("./cache", video_name, "audio.mp3")
+
 # skip extraction if frames and audio already exist
-imgs_exist = os.path.isdir("./imgs") and len(os.listdir("./imgs")) > 0
-audio_exists = os.path.isfile("./audio.mp3")
+imgs_exist = os.path.isdir(imgs_dir) and len(os.listdir(imgs_dir)) > 0
+audio_exists = os.path.isfile(audio_path)
 
 if not imgs_exist or not audio_exists:
     print("processing, this may take a moment (depending on your video duration)")
     times = [i/fps for i in range(int(fps * clip.duration))]
     if not imgs_exist:
-        extract_frames(clip, times, "./imgs")
+        extract_frames(clip, times, imgs_dir)
     if not audio_exists:
-        extract_audio(args.input, "./audio.mp3")
+        extract_audio(args.input, audio_path)
 else:
     print("using cached frames and audio")
 
 frame_delay = 1.0 / fps
-filenames = sorted(os.listdir("./imgs"), key=lambda f: int(f.split('.')[0]))
+filenames = sorted(os.listdir(imgs_dir), key=lambda f: int(f.split('.')[0]))
 
 # set up display mode
-if args.mode == "notepad":
-    subprocess.Popen(['notepad.exe'])
-    time.sleep(2)  # wait for Notepad to open
-
-    # find the Notepad window — try both classic and modern class names
-    hwnd = win32gui.FindWindow("Notepad", None)
-    if not hwnd:
-        # Windows 11 modern Notepad uses a different class
-        def find_notepad(hwnd, results):
-            if win32gui.IsWindowVisible(hwnd):
-                title = win32gui.GetWindowText(hwnd)
-                if "Notepad" in title or "Untitled" in title:
-                    results.append(hwnd)
-        results = []
-        win32gui.EnumWindows(find_notepad, results)
-        hwnd = results[0] if results else None
-
-    if not hwnd:
-        print("could not find Notepad window")
-        exit(1)
-
-    # walk all descendants to find a text edit control
-    edit = win32gui.FindWindowEx(hwnd, None, "Edit", None)
-    if not edit:
-        # modern Notepad nests the edit control deeper — search recursively
-        def find_edit(parent):
-            child = None
-            while True:
-                child = win32gui.FindWindowEx(parent, child, None, None)
-                if not child:
-                    return None
-                class_name = win32gui.GetClassName(child)
-                if class_name in ("Edit", "RichEditD2DPT"):
-                    return child
-                # recurse into children
-                found = find_edit(child)
-                if found:
-                    return found
-        edit = find_edit(hwnd)
-
-    if not edit:
-        print("could not find Notepad's edit control")
-        print("debug: Notepad hwnd =", hwnd, "class =", win32gui.GetClassName(hwnd))
-        exit(1)
-else:
+driver = make_editor_driver() if editor_mode else None
+if driver is None:
     os.system('cls' if os.name == 'nt' else 'clear')
 
 # start music in a thread so it doesn't block frame rendering
-music_thread = threading.Thread(target=play_music, args=('./audio.mp3',))
+music_thread = threading.Thread(target=play_music, args=(audio_path,))
 music_thread.start()
 
-for filename in filenames:
-    frame_start = time.time()
+try:
+    for filename in filenames:
+        frame_start = time.time()
 
-    filepath = os.path.join("./imgs", filename)
-    ascii_art = image_to_ascii(filepath, size=(args.width, args.height), colorful=args.color == "true", fix_scaling=False)
+        filepath = os.path.join(imgs_dir, filename)
+        ascii_art = image_to_ascii(filepath, size=(args.width, args.height), colorful=args.color == "true", fix_scaling=False)
 
-    if args.mode == "notepad":
-        win32api.SendMessage(edit, win32con.WM_SETTEXT, 0, ascii_art)
-    else:
-        print("\033[H" + ascii_art, flush=True)
+        if driver is not None:
+            driver.set_text(ascii_art)
+        else:
+            print("\033[H" + ascii_art, flush=True)
 
-    # sleep the remaining time to stay in sync with the video's FPS
-    elapsed = time.time() - frame_start
-    sleep_time = frame_delay - elapsed
-    if sleep_time > 0:
-        time.sleep(sleep_time)
-
-stop_music()
+        # sleep the remaining time to stay in sync with the video's FPS
+        elapsed = time.time() - frame_start
+        sleep_time = frame_delay - elapsed
+        if sleep_time > 0:
+            time.sleep(sleep_time)
+except KeyboardInterrupt:
+    pass
+finally:
+    stop_music()
+    if driver is not None:
+        driver.close()

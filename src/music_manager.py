@@ -1,7 +1,11 @@
-import pygame, threading, time
+import pygame
 
 def stop_music():
-    pygame.mixer.music.stop()
+    try:
+        if pygame.mixer.get_init():
+            pygame.mixer.music.stop()
+    except Exception:
+        pass
 
 def play_music(mp3File):
     pygame.mixer.init()

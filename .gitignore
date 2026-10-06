@@ -34,3 +34,5 @@ output.txt
 
 # Other
 .claude/
+# Per-video frame/audio cache
+cache/

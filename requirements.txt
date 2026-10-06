@@ -4,4 +4,11 @@ pillow
 numpy
 requests
 sty
-pywin32
+pywin32; sys_platform == "win32"
+
+# Linux only, and it is usually better to install this from your distro's
+# package manager instead of pip (see the README):
+#   Arch       : sudo pacman -S python-gobject at-spi2-core
+#   Debian/Ubu : sudo apt install python3-gi gir1.2-atspi-2.0 at-spi2-core
+#   Fedora     : sudo dnf install python3-gobject at-spi2-core
+# PyGObject; sys_platform == "linux"
